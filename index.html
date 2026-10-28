@@ -1,24 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
-  <link rel="icon" href="./heart.png" type="image/x-icon">
   <meta charset="UTF-8">
-  <title>DUK-Handout</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF</title>
+  <link rel="icon" href="./favicon.ico">
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      background-color: #000000;
-    }
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
+    :root { color-scheme: dark; }
+    html, body { margin: 0; height: 100%; background: #000; font: 15px/1.4 system-ui, sans-serif; }
+    body { display: flex; flex-direction: column; }
+    .leiste { display: flex; align-items: center; gap: 12px; padding: 8px 12px; background: #111; color: #ddd; }
+    .leiste .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .leiste a { color: #8ab4ff; text-decoration: none; padding: 6px 10px; border-radius: 8px; }
+    .leiste a:hover, .leiste a:focus-visible { background: #222; }
+    iframe { flex: 1; width: 100%; border: 0; }
   </style>
 </head>
 <body>
-  <iframe src="DUK-Handout.pdf"></iframe>
+  <!-- Welche Datei angezeigt wird: ?pdf=datei.pdf in der Adresse, sonst die Datei unten -->
+  <div class="leiste">
+    <span class="name" id="name"></span>
+    <a id="oeffnen" target="_blank" rel="noopener">In neuem Tab</a>
+    <a id="laden" download>Herunterladen</a>
+  </div>
+  <iframe id="pdf" title="PDF-Dokument"></iframe>
+
+  <script>
+    const STANDARD = 'dokument.pdf';
+    // Nur Dateien von dieser Seite erlauben (keine fremden Adressen über ?pdf=)
+    const wunsch = new URLSearchParams(location.search).get('pdf') || STANDARD;
+    const datei = /^[\w\-. /]+\.pdf$/i.test(wunsch) && !wunsch.includes('..') && !wunsch.startsWith('//') ? wunsch : STANDARD;
+    const name = datei.split('/').pop();
+    document.title = name.replace(/\.pdf$/i, '');
+    document.getElementById('name').textContent = name;
+    for (const id of ['pdf', 'oeffnen', 'laden']) {
+      document.getElementById(id)[id === 'pdf' ? 'src' : 'href'] = encodeURI(datei);
+    }
+  </script>
 </body>
 </html>
